@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="pt-BR">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexoLink Premium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfo3pbo2yCZ7z4sC3XL3aYg59DnfMUP64",
+      authDomain: "encurtador-d3db5.firebaseapp.com",
+      projectId: "encurtador-d3db5",
+      storageBucket: "encurtador-d3db5.firebasestorage.app",
+      messagingSenderId: "899955922702",
+      appId: "1:899955922702:web:b208292bc1468076a4695f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window._db = db;
+    window._firestoreDoc = doc;
+    window._firestoreSetDoc = setDoc;
+    window._firestoreGetDoc = getDoc;
+    window._firebaseReady = true;
+    document.dispatchEvent(new Event('firebase-ready'));
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --white: #050505;
+      --bg: #0f0f11;
+      --bg2: #161618;
+      --border: #27272a;
+      --border2: #3f3f46;
+      --text: #fafafa;
+      --text2: #a1a1aa;
+      --text3: #52525b;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.5);
+      --green: #22c55e;
+      --red: #ef4444;
+      --radius: 12px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--white);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Fundo Animado Premium */
+    .bg-gradient {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% -20%, #1e3a8a 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, #1e1b4b 0%, transparent 40%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .screen { display: none; min-height: 100vh; flex-direction: column; animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .screen.active { display: flex; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Navbar com Glassmorphism */
+    .nav {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(5, 5, 5, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-logo { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+    .nav-logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent-glow); }
+    .nav-link { font-size: 13px; color: var(--text2); cursor: pointer; text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--text); }
+
+    .wrap { width: 100%; max-width: 480px; margin: 0 auto; padding: 32px 20px; display: flex; flex-direction: column; gap: 16px; flex: 1; }
+    .page-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; background: linear-gradient(to right, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .page-sub { font-size: 14px; color: var(--text2); margin-top: 6px; line-height: 1.6; }
+
+    /* Cards com efeito de vidro sutil */
+    .card {
+      background: rgba(22, 22, 24, 0.6);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      backdrop-filter: blur(10px);
+    }
+    .card-title { font-size: 15px; font-weight: 700; }
+    .card-sub { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .feat {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feat:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); }
+    .feat-icon { width: 28px; height: 28px; margin: 0 auto 8px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .feat-icon svg { width: 14px; height: 14px; stroke: var(--text2); fill: none; stroke-width: 2; stroke-linecap: round; }
+    .feat-label { font-size: 12px; font-weight: 600; color: var(--text); }
+    .feat-desc { font-size: 11px; color: var(--text3); margin-top: 2px; line-height: 1.3; }
+    .divider { height: 1px; background: rgba(255,255,255,0.08); width: 100%; }
+
+    /* Botões Premium */
+    .btn {
+      width: 100%; height: 44px; border-radius: 10px; border: none;
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+      position: relative; overflow: hidden;
+    }
+    .btn-black { 
+      background: #fff; color: #000; 
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+    .btn-black:hover { background: #e4e4e7; transform: scale(1.02); }
+    .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; font-weight: 600; color: var(--text2); }
+    .field input {
+      height: 42px; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0 12px; color: var(--text);
+      font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: all 0.2s; width: 100%;
+    }
+    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+    .field input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
+
+    .avatar-row {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 10px; cursor: pointer; transition: all 0.2s;
+    }
+    .avatar-row:hover { border-color: var(--border2); background: rgba(255,255,255,0.05); }
+    .avatar-circle { width: 48px; height: 48px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+    .avatar-circle svg { width: 20px; height: 20px; stroke: var(--text3); fill: none; stroke-width: 1.5; }
+    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-txt h4 { font-size: 13px; font-weight: 600; }
+    .avatar-txt p { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+    .task-field { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .task-field-header { display: flex; justify-content: space-between; align-items: center; }
+    .task-field-header span { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+    .task-remove { font-size: 12px; color: var(--text3); cursor: pointer; background: none; border: none; font-family: 'Inter', sans-serif; }
+    .task-remove:hover { color: var(--red); }
+    .task-input {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 11px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; width: 100%;
+    }
+    .task-input:focus { border-color: var(--accent); }
+
+    .link-box {
+      display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+      background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px;
+    }
+    .link-box span { flex: 1; font-family: monospace; font-size: 12px; color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .copy-btn {
+      font-size: 11px; font-weight: 600; color: var(--text3); cursor: pointer;
+      padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border2);
+      background: rgba(255,255,255,0.05); font-family: 'Inter', sans-serif; transition: all 0.2s; flex-shrink: 0;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green); background: rgba(34, 197, 94, 0.1); }
+
+    .creator-header {
+      background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.08); padding: 16px 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .creator-av { width: 48px; height: 48px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+    .creator-info { flex: 1; }
+    .creator-name { font-size: 15px; font-weight: 700; }
+    .creator-handle { font-size: 12px; color: var(--text3); margin-top: 1px; font-family: monospace; }
+    .creator-socials { display: flex; gap: 6px; }
+    .social-btn {
+      width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .social-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+    .social-btn svg { width: 14px; height: 14px; fill: none; stroke: var(--text2); stroke-width: 2; stroke-linecap: round; }
+
+    .hero-text { padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--text); background: rgba(59, 130, 246, 0.1); border-bottom: 1px solid rgba(59, 130, 246, 0.2); text-align: center; }
+
+    .progress-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); padding: 16px; }
+    .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .progress-label { font-size: 13px; font-weight: 600; }
+    .progress-count { font-size: 12px; color: var(--text3); }
+    .progress-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; box-shadow: 0 0 10px var(--accent-glow); }
+
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+    .task {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .task:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); transform: translateX(4px); }
+    .task.done { border-color: rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.05); cursor: default; }
+    .task-icon-box { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .task-icon-box svg { width: 15px; height: 15px; fill: none; stroke: var(--text2); stroke-width: 2; stroke-linecap: round; }
+    .task.done .task-icon-box { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); }
+    .task.done .task-icon-box svg { stroke: var(--green); }
+    .task-info { flex: 1; }
+    .task-name { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.3px; }
+    .task-desc { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+    .task-time { font-size: 11px; color: var(--text3); margin-top: 3px; }
+    .task-time.warning { color: var(--red) !important; }
+    .task-time.active { color: var(--accent) !important; }
+    .task-arrow { color: var(--text3); display: flex; }
+    .task-arrow svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+    .task.done .task-arrow { color: var(--green); }
+
+    .unlock-btn {
+      width: 100%; height: 50px; border-radius: 12px; border: none;
+      font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .unlock-btn.locked { background: rgba(255,255,255,0.05); color: var(--text3); border: 1px solid var(--border); cursor: not-allowed; }
+    .unlock-btn.unlocked { 
+      background: var(--accent); color: #fff; 
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .unlock-btn.unlocked:hover { transform: scale(1.02); filter: brightness(1.1); }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; align-items: flex-end; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #111; border: 1px solid var(--border); border-radius: 16px 16px 0 0;
+      width: 100%; max-width: 560px; padding: 20px 20px 32px; display: flex; flex-direction: column; gap: 12px;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle { width: 32px; height: 4px; background: var(--border2); border-radius: 2px; align-self: center; margin-bottom: 4px; }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    .modal-timer { font-size: 13px; color: var(--text3); text-align: center; min-height: 18px; }
+    .modal-btn { width: 100%; height: 44px; border-radius: 10px; border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .modal-btn-primary { background: var(--text); color: #000; }
+    .modal-btn-primary:hover { background: #e4e4e7; }
+    .modal-btn-link { background: rgba(255,255,255,0.05); color: var(--text2); border: 1px solid var(--border); }
+    .modal-btn-link:hover { background: rgba(255,255,255,0.1); }
+    .modal-btn-ghost { background: transparent; color: var(--text3); border: 1px solid var(--border); }
+    
+    .foot { text-align: center; font-size: 12px; color: var(--text3); padding-bottom: 20px; }
+    .foot a { color: var(--accent); text-decoration: none; }
+    .center-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px 20px; text-align: center; }
+    .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--text); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .section-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+    .success-mark { width: 56px; height: 56px; border-radius: 50%; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); display: flex; align-items: center; justify-content: center; align-self: center; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
+    .success-mark svg { width: 24px; height: 24px; fill: none; stroke: var(--green); stroke-width: 2.5; stroke-linecap: round; }
+  </style>
+ </head>
+ <body>
+  <div class="bg-gradient"></div>
+  <!-- TELA PÚBLICA -->
+  <div class="screen active" id="s-public">
+   <div class="creator-header">
+    <div class="creator-av" id="pubAvatar">
+     <svg viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+     </svg>
+    </div>
+    <div class="creator-info">
+     <div class="creator-name" id="pubNome">Carregando...</div>
+     <div class="creator-handle" id="pubHandle">nexolink</div>
+    </div>
+    <div class="creator-socials" id="pubSocials"></div>
+   </div>
+   <div class="hero-text">Complete as tarefas para desbloquear</div>
+   <div class="wrap" style="gap:12px;">
+    <div class="progress-card">
+     <div class="progress-top">
+      <span class="progress-label">Progresso</span> <span class="progress-count" id="progressCount">0 / 0</span>
+     </div>
+     <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+     </div>
+    </div>
+    <div>
+     <div class="section-label" style="margin-bottom:8px;">Tarefas Obrigatórias</div>
+     <div class="task-list" id="taskList"></div>
+    </div>
+    <button class="unlock-btn locked" id="unlockBtn" disabled onclick="acessarLink()">🔒 Bloqueado</button>
+    <p class="foot">Powered by <a href="javascript:void(0)" onclick="voltarParaPublico()">NexoLink</a></p>
+   </div>
+  </div>
+  <!-- MODAL DE TAREFA -->
+  <div class="modal-overlay" id="modalOverlay">
+   <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+     <div class="task-icon-box" id="modalIconBox">
+      <svg viewBox="0 0 24 24">
+       <path d="M9 12l2 2 4-4" /><circle cx="12" cy="12" r="9" />
+      </svg>
+     </div>
+     <div class="modal-title" id="modalTitle"></div>
+    </div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="modal-timer" id="modalTimer"></div>
+    <button class="modal-btn modal-btn-link" id="modalLinkBtn" style="display:none; margin-top:8px;">Abrir Link da Tarefa</button>
+    <button class="modal-btn modal-btn-primary" id="modalBtn" onclick="completeTask()" style="margin-top:8px;">Iniciar Contagem</button>
+    <button class="modal-btn modal-btn-ghost" onclick="closeModal()" style="margin-top:8px;">Cancelar</button>
+   </div>
+  </div>
+  <!-- TELA HOME -->
+  <div class="screen" id="s-home">
+   <nav class="nav">
+    <div class="nav-logo">
+     <div class="nav-logo-dot"></div>
+     NexoLink
+    </div>
+    <span class="nav-link" id="btnVoltarPublico" style="display:none;" onclick="goTo('s-public')">← Voltar</span>
+   </nav>
+   <div class="wrap">
+    <div style="text-align:center; margin-bottom:10px;">
+     <div class="page-title">Encurtador Premium</div>
+     <div class="page-sub">Crie links inteligentes com tarefas de engajamento.</div>
+    </div>
+    <div class="feat-grid">
+     <div class="feat">
+      <div class="feat-icon">
+       <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+       </svg>
+      </div>
+      <div class="feat-label">Perfil</div>
+      <div class="feat-desc">Personalizado</div>
+     </div>
+     <div class="feat">
+      <div class="feat-icon">
+       <svg viewBox="0 0 24 24">
+        <path d="M9 12l2 2 4-4" /><rect x="3" y="3" width="18" height="18" rx="3" />
+       </svg>
+      </div>
+      <div class="feat-label">Tarefas</div>
+      <div class="feat-desc">Automatizadas</div>
+     </div>
+     <div class="feat">
+      <div class="feat-icon">
+       <svg viewBox="0 0 24 24">
+        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+       </svg>
+      </div>
+      <div class="feat-label">Analytics</div>
+      <div class="feat-desc">Em tempo real</div>
+     </div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn-black" onclick="goTo('s-create')">Criar Novo Link</button>
+    <p class="foot">Grátis e sem cadastro</p>
+   </div>
+  </div>
+  <!-- TELA CRIAR -->
+  <div class="screen" id="s-create">
+   <nav class="nav">
+    <div class="nav-logo">
+     <div class="nav-logo-dot"></div>
+     NexoLink
+    </div>
+    <span class="nav-link" onclick="goTo('s-home')">← Voltar</span>
+   </nav>
+   <div class="wrap">
+    <div>
+     <div class="page-title">Configurar Link</div>
+     <div class="page-sub">Defina seu perfil e as regras de acesso.</div>
+    </div>
+    <div class="card">
+     <div class="card-title">Identidade Visual</div>
+     <div class="avatar-row" onclick="document.getElementById('avatarFile').click()">
+      <div class="avatar-circle" id="avatarCircle">
+       <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+       </svg>
+      </div>
+      <div class="avatar-txt">
+       <h4>Alterar Foto</h4>
+       <p>Toque para selecionar</p>
+      </div>
+      <input type="file" id="avatarFile" accept="image/*" style="display:none" onchange="handleAvatar(this)">
+     </div>
+     <div class="field">
+      <label>Nome do Perfil *</label> <input type="text" id="inputNome" placeholder="Ex: Canal do YouTube" maxlength="30">
+     </div>
+     <div class="field">
+      <label>Link de Destino *</label> <input type="url" id="inputLink" placeholder="https://seulink.com">
+     </div>
+    </div>
+    <div class="card">
+     <div class="card-title">Redes Sociais</div>
+     <div class="field">
+      <label>YouTube</label><input type="url" id="inputYT" placeholder="https://youtube.com/@...">
+     </div>
+     <div class="field">
+      <label>Instagram</label><input type="url" id="inputIG" placeholder="https://instagram.com/...">
+     </div>
+     <div class="field">
+      <label>Discord</label><input type="url" id="inputDC" placeholder="https://discord.gg/...">
+     </div>
+    </div>
+    <div class="card">
+     <div class="card-title">Regras de Acesso</div>
+     <div class="card-sub">O usuário deve completar estas tarefas para liberar o link.</div>
+     <div id="taskFields" style="display:flex;flex-direction:column;gap:8px;"></div>
+     <button class="btn btn-outline" onclick="addTaskField()" style="height:38px;font-size:13px;margin-top:8px;">+ Adicionar Tarefa</button>
+    </div>
+    <button class="btn btn-black" id="btnPublicar" onclick="publicar()">Gerar Link Premium</button>
+   </div>
+  </div>
+  <!-- TELA GERADO -->
+  <div class="screen" id="s-gerado">
+   <nav class="nav">
+    <div class="nav-logo">
+     <div class="nav-logo-dot"></div>
+     NexoLink
+    </div>
+    <span class="nav-link" onclick="goTo('s-create')">← Editar</span>
+   </nav>
+   <div class="wrap">
+    <div class="success-mark">
+     <svg viewBox="0 0 24 24">
+      <path d="M5 13l4 4L19 7" />
+     </svg>
+    </div>
+    <div style="text-align:center;">
+     <div class="page-title">Sucesso!</div>
+     <div class="page-sub">Seu link inteligente está pronto para viralizar.</div>
+    </div>
+    <div class="link-box">
+     <span id="linkGerado">nexolink.vercel.app/?p=seuperfil</span>
+     <button class="copy-btn" id="copyBtn" onclick="copiar()">Copiar</button>
+    </div>
+    <p class="foot" style="margin-top:4px;">Compartilhe agora mesmo</p>
+   </div>
+  </div>
+  <!-- LOADING -->
+  <div class="screen" id="s-loading">
+   <div class="center-screen">
+    <div class="spinner"></div>
+    <p style="font-size:14px;color:var(--text2);">Processando...</p>
+   </div>
+  </div>
+  <!-- 404 -->
+  <div class="screen" id="s-404">
+   <nav class="nav">
+    <div class="nav-logo">
+     <div class="nav-logo-dot"></div>
+     NexoLink
+    </div>
+   </nav>
+   <div class="center-screen">
+    <div style="font-size:32px;font-weight:800;color:var(--text);">404</div>
+    <div style="font-size:16px;font-weight:700;">Link Indisponível</div>
+    <p style="font-size:14px;color:var(--text2);">Este link foi removido ou não existe.</p>
+    <button class="btn btn-black" style="max-width:220px;margin-top:8px;" onclick="goTo('s-home')">Criar o meu</button>
+   </div>
+  </div>
+    <script>
+    let savedAvatar = null, savedNome = '', savedLink = '', savedSocials = {}, savedTasks = [], savedSlug = '';
+    let completedTasks = new Set(), activeTaskIndex = -1, taskTimerRef = null;
+
+    const defaultTasks = [
+      { name: 'INSCREVA-SE NO CANAL', desc: 'Acesse o canal e clique em Inscrever-se para continuar.', url: '', time: 30 },
+      { name: 'ATIVE AS NOTIFICAÇÕES', desc: 'Clique no sino de notificações e selecione Todas.', url: '', time: 20 }
+    ];
+
+    function goTo(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    // FUNÇÃO CORRIGIDA COM COMPRESSÃO DE IMAGEM
+    function handleAvatar(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Redimensiona para max 300px mantendo proporção
+          const maxSize = 300;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width *= maxSize / height;
+              height = maxSize;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Converte para JPEG com 70% de qualidade (reduz drasticamente o tamanho)
+          savedAvatar = canvas.toDataURL('image/jpeg', 0.7);
+          
+          const c = document.getElementById('avatarCircle');
+          c.innerHTML = `<img src="${savedAvatar}">`;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function addTaskField(task = null) {
+      const container = document.getElementById('taskFields');
+      const idx = container.children.length;
+      const div = document.createElement('div');
+      div.className = 'task-field';
+      div.setAttribute('data-task', '');
+      div.innerHTML = `
+        <div class="task-field-header">
+          <span>Tarefa ${idx + 1}</span>
+          <button class="task-remove" onclick="removeTask(this)">Remover</button>
+        </div>
+        <input class="task-input" type="text" placeholder="Nome da tarefa (ex: INSCREVA-SE)" value="${task ? task.name : ''}">
+        <input class="task-input" type="text" placeholder="Descrição curta" value="${task ? task.desc : ''}">
+        <input class="task-input" type="url" placeholder="Link da tarefa (opcional)" value="${task ? (task.url||'') : ''}">
+        <input class="task-input" type="number" placeholder="Tempo em segundos (ex: 30)" value="${task ? task.time : ''}" min="5" max="300">
+      `;
+      container.appendChild(div);
+    }
+
+    function removeTask(btn) {
+      const taskDiv = btn.closest('[data-task]');
+      const container = document.getElementById('taskFields');
+      if (container.children.length <= 1) {
+        alert('É necessário pelo menos 1 tarefa.');
+        return;
+      }
+      taskDiv.remove();
+    }
+
+    async function publicar() {
+      const now = Date.now();
+      const key = 'nexolink_publishes';
+      let history = JSON.parse(sessionStorage.getItem(key) || '[]');
+      history = history.filter(t => now - t < 3600000);
+      if (history.length >= 3) {
+        alert('Limite de criação atingido. Tente novamente mais tarde.');
+        return;
+      }
+      const nome = document.getElementById('inputNome').value.trim();
+      const link = document.getElementById('inputLink').value.trim();
+      document.getElementById('inputNome').classList.remove('error');
+      document.getElementById('inputLink').classList.remove('error');
+      if (!nome) { document.getElementById('inputNome').classList.add('error'); return; }
+      if (!link) { document.getElementById('inputLink').classList.add('error'); return; }
+
+      const taskDivs = document.querySelectorAll('#taskFields [data-task]');
+      const tasks = [];
+      taskDivs.forEach(div => {
+        const inputs = div.querySelectorAll('input');
+        const name = inputs[0].value.trim();
+        const desc = inputs[1].value.trim();
+        const url = inputs[2].value.trim();
+        const time = parseInt(inputs[3].value) || 30;
+        if (name) tasks.push({ name, desc, url, time });
+      });
+
+      if (tasks.length === 0) { alert('Adicione pelo menos 1 tarefa.'); return; }
+
+      savedNome = nome; savedLink = link;
+      savedSocials = { yt: document.getElementById('inputYT').value.trim(), ig: document.getElementById('inputIG').value.trim(), dc: document.getElementById('inputDC').value.trim() };
+      savedTasks = tasks;
+
+      const slug = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+      savedSlug = slug;
+
+      const btn = document.getElementById('btnPublicar');
+      btn.textContent = 'Salvando...';
+      btn.disabled = true;
+
+      try {
+        await window._firestoreSetDoc(window._firestoreDoc(window._db, 'perfis', slug), {
+          nome: savedNome, link: savedLink, avatar: savedAvatar || null,
+          socials: savedSocials, tasks: savedTasks, slug,
+          criadoEm: new Date().toISOString()
+        });
+        document.getElementById('linkGerado').textContent = `${location.origin}${location.pathname}?p=${slug}`;
+        history.push(now);
+        sessionStorage.setItem(key, JSON.stringify(history));
+        goTo('s-gerado');
+      } catch (err) {
+        alert('Erro ao salvar. Verifique sua conexão.\n' + err.message);
+      } finally {
+        btn.textContent = 'Gerar Link Premium';
+        btn.disabled = false;
+      }
+    }
+
+    function copiar() {
+      const txt = document.getElementById('linkGerado').textContent;
+      const btn = document.getElementById('copyBtn');
+      navigator.clipboard.writeText(txt).then(() => {
+        btn.textContent = 'Copiado!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    function carregarPerfil(data) {
+      completedTasks.clear();
+      document.getElementById('pubNome').textContent = data.nome;
+      document.getElementById('pubHandle').textContent = `@${data.slug.replace(/-/g,'')}`;
+
+      const av = document.getElementById('pubAvatar');
+      av.innerHTML = data.avatar ? `<img src="${data.avatar}">` : `<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:#999;stroke-width:1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`;
+
+      const socials = document.getElementById('pubSocials');
+      socials.innerHTML = '';
+      if (data.socials?.yt) socials.innerHTML += `<a class="social-btn" href="${data.socials.yt}" target="_blank"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></a>`;
+      if (data.socials?.ig) socials.innerHTML += `<a class="social-btn" href="${data.socials.ig}" target="_blank"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#555" stroke="none"/></svg></a>`;
+      if (data.socials?.dc) socials.innerHTML += `<a class="social-btn" href="${data.socials.dc}" target="_blank"><svg viewBox="0 0 24 24"><path d="M9 12h.01M15 12h.01M8.5 8.5S9.5 8 12 8s3.5.5 3.5.5M8.5 15.5S9.5 16 12 16s3.5-.5 3.5-.5M5 3l1.5 3M19 3l-1.5 3M5 21l1.5-3M19 21l-1.5-3"/></svg></a>`;
+
+      savedTasks = data.tasks || defaultTasks;
+      savedLink = data.link;
+      renderTasks();
+      updateProgress();
+      goTo('s-public');
+    }
+
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      savedTasks.forEach((t, i) => {
+        const done = completedTasks.has(i);
+        const div = document.createElement('div');
+        div.className = `task${done ? ' done' : ''}`;
+        div.onclick = done ? null : () => openModal(i);
+        div.innerHTML = `
+          <div class="task-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+          </div>
+          <div class="task-info">
+            <div class="task-name">${t.name}</div>
+            <div class="task-desc">${t.desc}</div>
+            <div class="task-time">${t.time}s restantes</div>
+          </div>
+          <div class="task-arrow">
+            <svg viewBox="0 0 24 24"><path d="${done ? 'M5 13l4 4L19 7' : 'M9 18l6-6-6-6'}"/></svg>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function updateProgress() {
+      const total = savedTasks.length, done = completedTasks.size;
+      document.getElementById('progressCount').textContent = `${done} / ${total}`;
+      document.getElementById('progressFill').style.width = `${(done/total)*100}%`;
+      const btn = document.getElementById('unlockBtn');
+      if (done >= total) {
+        btn.disabled = false;
+        btn.className = 'unlock-btn unlocked';
+        btn.innerHTML = ' Acessar Link Agora';
+      } else {
+        btn.disabled = true;
+        btn.className = 'unlock-btn locked';
+        btn.innerHTML = ' Bloqueado';
+      }
+    }
+
+    function openModal(idx) {
+      if (activeTaskIndex === idx) return;
+      activeTaskIndex = idx;
+      const t = savedTasks[idx];
+
+      if (t.url) window.open(t.url, '_blank');
+
+      let s = t.time;
+      let paused = true;
+
+      function handleVisibility() {
+        paused = document.hidden;
+        renderTaskTimer(idx, s, paused);
+      }
+
+      document.addEventListener('visibilitychange', handleVisibility);
+
+      taskTimerRef = setInterval(() => {
+        if (paused) return;
+        s--;
+        renderTaskTimer(idx, s, false);
+        if (s <= 0) {
+          clearInterval(taskTimerRef);
+          document.removeEventListener('visibilitychange', handleVisibility);
+          completedTasks.add(idx);
+          activeTaskIndex = -1;
+          renderTasks();
+          updateProgress();
+        }
+      }, 1000);
+    }
+
+    function renderTaskTimer(idx, s, paused = true) {
+      const items = document.querySelectorAll('.task');
+      const el = items[idx];
+      if (!el) return;
+      const timeEl = el.querySelector('.task-time');
+      if (!timeEl) return;
+      
+      timeEl.textContent = `${s}s restantes`;
+      timeEl.className = 'task-time';
+      
+      if (paused) {
+        timeEl.classList.add('warning');
+      } else {
+        timeEl.classList.add('active');
+      }
+    }
+
+    function closeModal() {}
+    function completeTask() {}
+
+    function acessarLink() {
+      if (completedTasks.size >= savedTasks.length) window.open(savedLink, '_blank');
+    }
+
+    function voltarParaPublico() {
+      document.getElementById('btnVoltarPublico').style.display = 'block';
+      goTo('s-home');
+    }
+
+    async function init() {
+      const slug = new URLSearchParams(location.search).get('p');
+      if (slug) {
+        goTo('s-loading');
+        try {
+          const snap = await window._firestoreGetDoc(window._firestoreDoc(window._db, 'perfis', slug));
+          snap.exists() ? carregarPerfil(snap.data()) : goTo('s-404');
+        } catch { goTo('s-404'); }
+      } else {
+        goTo('s-home');
+      }
+      defaultTasks.forEach(t => addTaskField(t));
+    }
+
+    window._firebaseReady ? init() : document.addEventListener('firebase-ready', init);
+  </script>
+</body>
+</html>
